@@ -1,18 +1,11 @@
-define([ ], function () {
+define([ 'assets' ], function (assets) {
     function main(stage) {
-        var loader = new sp.Loader();
-        loader.contentLoaderInfo.addEventListener(function (event) {
-            var appDomain = event.target.applicationDomain;
+        assets.load(function (err) {
+            if (err) die(err);
 
-            // TODO Do something useful
-
-            rel(arguments);
+            var playerMC = new assets.art.Player();
+            stage.addChild(playerMC);
         });
-
-        loader.load(new sp.URLRequest('../common/assets/game.swf'));
-        stage.addChild(loader); // Temporary
-
-        console.log("Hello, world!");
     }
 
     return main;
