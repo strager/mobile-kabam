@@ -5,7 +5,14 @@ define([ ], function () {
         load: load
     };
 
+    var isLoading = false;
     function load(callback) {
+        if (isLoading) {
+            die("load already called");
+        }
+
+        isLoading = true;
+
         function callCallback(/* */) {
             if (callback) {
                 var c = callback;
