@@ -1,7 +1,10 @@
 define([ 'assets' ], function (assets) {
-    function GameObject(type) {
+    function GameObject() {
         // Public
-        this.mc = new assets.art[type]();
+        this.mc = null;
+
+        this.isActive = true;
+        this.isDestroyed = false;
 
         // Private
         this.x = 0;
@@ -26,17 +29,45 @@ define([ 'assets' ], function (assets) {
         this.viewDirty();
     };
 
+    GameObject.prototype.destroy = function destroy() {
+        this.isActive = false;
+        this.isDestroyed = true;
+    };
+
+    GameObject.prototype.getPhysics = function getPhysics() {
+        return null;
+    };
+
     GameObject.prototype.tick = function tick() {
         // Do nothing
     };
 
     GameObject.prototype.render = function render() {
-        if (this.isViewDirty) {
+        if (this.isViewDirty && this.mc) {
             this.mc.x = this.x;
             this.mc.y = this.y;
 
             this.isViewDirty = false;
         }
+    };
+
+    GameObject.create = function create(proto) {
+        var ctor = proto.constructor || function () { };
+
+        function Klass() {
+            GameObject.call(this);
+            ctor.apply(this, arguments);
+        }
+
+        function Dummy() { }
+        Dummy.prototype = GameObject.prototype;
+
+        Klass.prototype = new Dummy();
+        Object.keys(proto).forEach(function (key) {
+            Klass.prototype[key] = proto[key];
+        });
+
+        return Klass;
     };
 
     return GameObject;

@@ -1,4 +1,4 @@
-define([ 'GameObject', 'enemyAI' ], function (GameObject, enemyAI) {
+define([ 'GameObject', 'gameObjects' ], function (GameObject, gameObjects) {
     var LEFT = 0;
     var RIGHT = 1;
     var UP = 2;
@@ -33,7 +33,7 @@ define([ 'GameObject', 'enemyAI' ], function (GameObject, enemyAI) {
 
         this.actions = { }; // Hash
 
-        this.player = new GameObject('Player');
+        this.player = new gameObjects.Player()
         this.stage.addChild(this.player.mc);
 
         this.playerMissiles = [ ];
@@ -82,7 +82,7 @@ define([ 'GameObject', 'enemyAI' ], function (GameObject, enemyAI) {
     };
 
     Game.prototype.playerMissile = function playerMissile(type) {
-        var missile = new GameObject(type);
+        var missile = new gameObjects[type]();
         this.stage.addChild(missile.mc);
         missile.moveTo(this.player.x, this.player.y);
         this.playerMissiles.push(missile);
@@ -90,11 +90,17 @@ define([ 'GameObject', 'enemyAI' ], function (GameObject, enemyAI) {
     };
 
     Game.prototype.enemy = function enemy(type) {
-        var enemy = new GameObject(type);
-        enemyAI[type](enemy);
+        var enemy = new gameObjects[type]();
         this.stage.addChild(enemy.mc);
         this.enemies.push(enemy);
         return enemy;
+    };
+
+    Game.prototype.testCollision = function testCollision(a, b) {
+        var ap = a.getPhysics();
+        var bp = b.getPhysics();
+
+        return ap && bp && ap.intersects(bp);
     };
 
     Game.prototype.tick = function tick() {
@@ -124,9 +130,21 @@ define([ 'GameObject', 'enemyAI' ], function (GameObject, enemyAI) {
             missile.moveBy(0, -PLAYER_MISSILE_SPEED);
         });
 
-        this.enemies.forEach(function (enemy) {
-            enemy.tick();
+        this.enemies.forEach(function (enemy, i) {
+            if (enemy.isActive) {
+                enemy.tick();
+            }
         });
+
+        this.playerMissiles.forEach(function (missile) {
+            this.enemies.forEach(function (enemy) {
+                if (this.testCollision(enemy, missile)) {
+                    enemy.destroy();
+                }
+            }, this);
+        }, this);
+
+        // TODO destroy game objects
     };
 
     Game.prototype.render = function render() {
