@@ -1,4 +1,4 @@
-define([ 'GameObject' ], function (GameObject) {
+define([ 'GameObject', 'enemyAI' ], function (GameObject, enemyAI) {
     var LEFT = 0;
     var RIGHT = 1;
     var UP = 2;
@@ -38,10 +38,19 @@ define([ 'GameObject' ], function (GameObject) {
 
         this.playerMissiles = [ ];
 
+        this.enemies = [ ];
+
         this.fireTimer = 0;
 
         this.stage.addEventListener(sp.KeyboardEvent.KEY_DOWN, this.keyDown.bind(this));
         this.stage.addEventListener(sp.KeyboardEvent.KEY_UP, this.keyUp.bind(this));
+
+        this.loadLevel({
+            player: { x: 200, y: 300 },
+            enemies: [
+                { type: 'Enemy1', x: 100, y: 80 }
+            ]
+        });
     }
 
     Game.prototype.keyDown = function keyDown(event) {
@@ -62,12 +71,30 @@ define([ 'GameObject' ], function (GameObject) {
         return this.actions[name] === true;
     };
 
+    Game.prototype.loadLevel = function loadLevel(level) {
+        // TODO Reset current state of all objects
+        this.player.moveTo(level.player.x, level.player.y);
+
+        level.enemies.forEach(function (enemyDesc) {
+            var enemy = this.enemy(enemyDesc.type);
+            enemy.moveTo(enemyDesc.x, enemyDesc.y);
+        }, this);
+    };
+
     Game.prototype.playerMissile = function playerMissile(type) {
         var missile = new GameObject(type);
         this.stage.addChild(missile.mc);
         missile.moveTo(this.player.x, this.player.y);
         this.playerMissiles.push(missile);
         return missile;
+    };
+
+    Game.prototype.enemy = function enemy(type) {
+        var enemy = new GameObject(type);
+        enemyAI[type](enemy);
+        this.stage.addChild(enemy.mc);
+        this.enemies.push(enemy);
+        return enemy;
     };
 
     Game.prototype.tick = function tick() {
@@ -96,6 +123,10 @@ define([ 'GameObject' ], function (GameObject) {
         this.playerMissiles.forEach(function (missile) {
             missile.moveBy(0, -PLAYER_MISSILE_SPEED);
         });
+
+        this.enemies.forEach(function (enemy) {
+            enemy.tick();
+        });
     };
 
     Game.prototype.render = function render() {
@@ -103,6 +134,10 @@ define([ 'GameObject' ], function (GameObject) {
 
         this.playerMissiles.forEach(function (missile) {
             missile.render();
+        });
+
+        this.enemies.forEach(function (enemy) {
+            enemy.render();
         });
     };
 

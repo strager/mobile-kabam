@@ -26,6 +26,10 @@ define([ 'assets' ], function (assets) {
         this.viewDirty();
     };
 
+    GameObject.prototype.tick = function tick() {
+        // Do nothing
+    };
+
     GameObject.prototype.render = function render() {
         if (this.isViewDirty) {
             this.mc.x = this.x;
