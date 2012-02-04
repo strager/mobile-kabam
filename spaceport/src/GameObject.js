@@ -1,7 +1,9 @@
 define([ 'assets' ], function (assets) {
     function GameObject(type) {
+        // Public
         this.mc = new assets.art[type]();
 
+        // Private
         this.x = 0;
         this.y = 0;
 
