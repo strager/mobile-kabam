@@ -1,0 +1,103 @@
+<!DOCTYPE html public "§">
+<html>
+<head>
+
+<meta charset="utf-8" />
+<title>Mobile Kabam - Spaceport</title>
+
+<style>
+#flashContent {
+    margin: 2em auto;
+    width: 640px;
+    height: 480px;
+    overflow: hidden;
+    display: absolute;
+}
+</style>
+
+</head>
+<body>
+
+<h1>Mobile Kabam - Spaceport</h1>
+
+<div id="flashContent"></div>
+
+<script>if (typeof __PLATFORM === 'undefined' && !/platform=/.test(location.search)) __PLATFORM = 'flash';</script>
+<script src="spaceport/spaceport.js"></script>
+<script src="spaceport/spaceport-html5.js"></script>
+<script>sp.bridge.swfPath = 'spaceport/Spaceport.swf';</script>
+<script src="../common/js/unrequire/lib/unrequire.js"></script>
+
+<script>
+// Some global functions to make my life sane
+function hasOwn(object, property) {
+    return Object.prototype.hasOwnProperty.call(object, property);
+}
+
+function die(message) {
+    console.assert(false, message);
+    throw new Error(message);
+}
+
+function extendDefault(target, defaults, options) {
+    if (typeof options !== 'object' || !options) {
+        options = { };
+    }
+
+    Object.keys(defaults).forEach(function (key) {
+        if (hasOwn(options, key)) {
+            target[key] = options[key];
+        } else {
+            target[key] = defaults[key];
+        }
+    });
+
+    return target;
+}
+
+function extend(target /* extensions */) {
+    var i;
+    for (i = 1; i < arguments.length; ++i) {
+        var o = arguments[i];
+        Object.keys(o).forEach(function (key) {
+            target[key] = o[key];
+        });
+    }
+    return target;
+}
+
+function rel(args) {
+    var event = args[0];
+    event.target.removeEventListener(event.type, args.callee);
+}
+
+(function () {
+    var isReady = false;
+    var onReady = null;
+
+    window.main = function main() {
+        // HACK to focus Flash
+        var frash = document.querySelector('object');
+        if (frash) {
+            frash.focus();
+        }
+
+        isReady = true;
+        if (onReady) {
+            onReady(sp.stage);
+        }
+    };
+
+    require({
+        baseUrl: 'src'
+    }, [ 'main' ], function (main) {
+        onReady = main;
+        if (isReady) {
+            onReady(sp.stage);
+        }
+    });
+}());
+</script>
+
+</body>
+</html>

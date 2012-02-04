@@ -1,0 +1,3 @@
+[submodule "common/js/unrequire"]
+	path = common/js/unrequire
+	url = git@github.com:sibblingz/unrequirejs.git
