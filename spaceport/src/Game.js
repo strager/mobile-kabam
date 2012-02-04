@@ -53,12 +53,15 @@ define([ 'GameObject' ], function (GameObject) {
         var length = Math.sqrt(playerVX * playerVX + playerVY * playerVY);
 
         if (length !== 0) {
-            this.player.mc.x += playerVX / length;
-            this.player.mc.y += playerVY / length;
+            this.player.moveBy(
+                playerVX / length,
+                playerVY / length
+            );
         }
     };
 
     Game.prototype.render = function render() {
+        this.player.render();
     };
 
     return Game;
